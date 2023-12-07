@@ -1,27 +1,54 @@
 ####
 from os import listdir
 from os.path import isfile, join
-path = "/zfshome/sukem124/aging/mice_cogn2/seqs/"
-filenames = [f for f in listdir(path)]
-binnames = [item[:-3] for item in filenames]
+out_folder = ""
+input_folder = "tutorial_files/"
+medium = "gf_medium.csv"
+mag_ending = ".fna"
 
-gapseq = "~/gapseq/gapseq"
-out_folder = "/zfshome/sukem124/aging/mice_cogn2/out/"
+
+filenames = [f for f in listdir(input_folder)]
+binnames = [item for item in filenames if item.endswith(mag_ending)]
+
+# For including or excluding media
+# https://stackoverflow.com/questions/64949149/is-it-possible-to-add-a-conditional-statement-in-snakemakes-rule-all 
+
+# Implement CPLEX switch
+# Implement medium switch
+# Implement cluster settings
+# move stuff to params
+# Move clone into deploy scripot 
 
 rule all:
-	input:
-		expand(out_folder + "{file}"+ ".RDS", file = binnames)
-			
+        input: 
+                "gapseq",
+                expand(out_folder + "prodigal/{file}"+ ".faa", file = binnames),
+		expand(out_folder + "gapseq_find/{file}"+ "-all-Pathways.tbl", file = binnames),
+		expand(out_folder + "gapseq_find/{file}"+ "-all-Reactions.tbl", file = binnames),
+                expand(out_folder + "gapseq_transport/{file}"+ "-Transporter.tbl", file = binnames),
+                expand(out_folder + "gapseq_draft/{file}"+ "-draft.RDS", file = binnames),
+                expand(out_folder + "gapseq_draft/{file}"+ "-rxnWeights.RDS", file = binnames),
+                expand(out_folder + "gapseq_draft/{file}"+ "-rxnXgenes.RDS", file = binnames),
+		expand(out_folder + "generated_medium/{file}"+ "-medium.csv", file = binnames),
+                expand(out_folder + "final_model/{file}"+ ".RDS", file = binnames),
+                expand(out_folder + "final_model/{file}"+ ".xml", file = binnames)
+
+rule clone_gs:
+        output:
+                directory("gapseq")
+        shell: 
+                """
+                git clone https://github.com/jotech/gapseq && mv gapseq/gapseq_env.yml gapseq.yml
+
+                """
+
 rule prodigal:
 	input:
-		bin=path+"{file}.fa"
+		bin=input_folder+"{file}"
 	output:
-		out=out_folder + "{file}.faa"
-	resources:
-		time="2:00:00",
-		slurm_extra="--cpu-per-task=6 --mem=50GB"
+		out=out_folder + "prodigal/" "{file}.faa"
 	conda:
-		"gapseq.yaml"
+		"prodigal.yml"
 	shell:
 		"""
 		prodigal -i {input.bin} -o /dev/null -a {output.out}
@@ -29,96 +56,88 @@ rule prodigal:
 
 rule pathway:
 	input:
-		faa=out_folder + "{file}.faa"
+                "gapseq/",
+		faa=out_folder + "prodigal/{file}.faa"
 	output:
-		out=out_folder + "{file}"+ "-all-Pathways.tbl",
-		react=out_folder + "{file}"+ "-all-Reactions.tbl"
-	resources:
-                time="10:00:00",
-                slurm_extra="--cpu-per-task=6 --mem=50GB"
+		out=out_folder + "gapseq_find/{file}"+ "-all-Pathways.tbl",
+		react=out_folder + "gapseq_find/{file}"+ "-all-Reactions.tbl"
 	conda:
-               "gapseq.yaml"
+               "gapseq.yml"
 	shell:
 		"""
-		{gapseq} find -v 0 -k -b 200 -p all -t auto {input.faa} && 
+		./gapseq/gapseq find -v 0 -k -b 200 -p all -t auto {input.faa} && 
 		mv {wildcards.file}-all-Pathways.tbl {output.out} &&
 		mv {wildcards.file}-all-Reactions.tbl {output.react}
 		"""
 
 rule transporter:
 	input:
-		faa=out_folder + "{file}.faa"
+                "gapseq/",
+		faa=out_folder + "prodigal/{file}.faa"
 	output: 
-                out=out_folder + "{file}"+ "-Transporter.tbl"
-	resources:
-                time="10:00:00",
-                slurm_extra="--cpu-per-task=6 --mem=50GB"
+                out=out_folder + "gapseq_transport/{file}"+ "-Transporter.tbl"
 	conda:
-               "gapseq.yaml"
+               "gapseq.yml"
 	shell:
 		"""
-		{gapseq} find-transport -v 0 -k -b 200 {input.faa} &&
+		./gapseq/gapseq find-transport -v 0 -k -b 200 {input.faa} &&
 		mv {wildcards.file}-Transporter.tbl {output.out}
 		"""
 rule draft_model:
 	input:
-                faa=out_folder + "{file}.faa",
-                path=out_folder + "{file}"+ "-all-Pathways.tbl",
-                react=out_folder + "{file}"+ "-all-Reactions.tbl",
-		trans=out_folder + "{file}"+ "-Transporter.tbl"	
+                "gapseq/",
+                faa=out_folder + "prodigal/{file}.faa",
+                path=out_folder + "gapseq_find/{file}"+ "-all-Pathways.tbl",
+                react=out_folder + "gapseq_find/{file}"+ "-all-Reactions.tbl",
+		trans=out_folder + "gapseq_transport/{file}"+ "-Transporter.tbl"	
 	output:
-                draft=out_folder + "{file}"+ "-draft.RDS",
-                weights=out_folder + "{file}"+ "-rxnWeights.RDS",
-                genes=out_folder + "{file}"+ "-rxnXgenes.RDS"
-	resources:
-                time="10:00:00",
-                slurm_extra="--cpu-per-task=6 --mem=50GB"
+                draft_rds=out_folder + "gapseq_draft/{file}"+ "-draft.RDS",
+                draft_xml=out_folder + "gapseq_draft/{file}"+ "-draft.xml",
+                weights=out_folder + "gapseq_draft/{file}"+ "-rxnWeights.RDS",
+                genes=out_folder + "gapseq_draft/{file}"+ "-rxnXgenes.RDS"
 	conda: 
-               "gapseq.yaml"
+               "gapseq.yml"
 	shell: 
 		"""
-	{gapseq} draft -r {input.react} -t {input.trans} -c {input.faa} -u 200 -l 100 -p {input.path} &&
-	mv {wildcards.file}-draft.RDS {output.draft} &&
+	./gapseq/gapseq draft -r {input.react} -t {input.trans} -c {input.faa} -u 200 -l 100 -p {input.path} #&&
+	mv {wildcards.file}-draft.RDS {output.draft_rds} &&
+	mv {wildcards.file}-draft.xml {output.draft_xml} &&
 	mv {wildcards.file}-rxnWeights.RDS {output.weights} &&
 	mv {wildcards.file}-rxnXgenes.RDS {output.genes}
 		"""
 rule medium:
 	input:
-		draft=out_folder + "{file}"+ "-draft.RDS",
-		path=out_folder + "{file}"+ "-all-Pathways.tbl"
+                "gapseq/",
+		draft=out_folder + "gapseq_draft/{file}"+ "-draft.RDS",
+		path=out_folder + "gapseq_find/{file}"+ "-all-Pathways.tbl"
 	output:
-		med=out_folder + "{file}"+ "-medium.csv"
-	resources:
-                 time="10:00:00",
-                 slurm_extra="--cpu-per-task=6 --mem=50GB"
+		med=out_folder + "generated_medium/{file}"+ "-medium.csv"
 	conda:
-                "gapseq.yaml"
+                "gapseq.yml"
 	shell:
 		"""
-		{gapseq} medium -m {input.draft} -p {input.path} &&
+		./gapseq/gapseq medium -m {input.draft} -p {input.path} &&
 		mv {wildcards.file}-medium.csv {output.med}
+               """
 
-		"""
 rule gap_filling:
 	input:
-		draft=out_folder + "{file}"+ "-draft.RDS",
-                weights=out_folder + "{file}"+ "-rxnWeights.RDS",
-                genes=out_folder + "{file}"+ "-rxnXgenes.RDS"
+                "gapseq/",
+		draft=out_folder + "gapseq_draft/{file}"+ "-draft.RDS",
+                weights=out_folder + "gapseq_draft/{file}"+ "-rxnWeights.RDS",
+                genes=out_folder + "gapseq_draft/{file}"+ "-rxnXgenes.RDS",
+		med=out_folder + "generated_medium/{file}"+ "-medium.csv"
 	output:
-		rds_model=out_folder + "{file}"+ ".RDS",
-		xml_model=out_folder + "{file}"+ ".xml"
-	resources:
-                time="10:00:00",
-                slurm_extra="--cpu-per-task=6 --mem=50GB"
+		rds_model=out_folder + "final_model/{file}"+ ".RDS",
+		xml_model=out_folder + "final_model/{file}"+ ".xml"
 	conda:
-               "gapseq.yaml"
+               "gapseq.yml"
 	shell:
 		"""
-		{gapseq} fill -m {input.draft} -n /zfshome/sukem124/aging/mice_cogn2/metamouse_diet2.csv -c {input.weights} -b 100 -g {input.genes} &&
-		mv {wildcards.file} + ".RDS"  {output.rds_model} &&
-		mv {wildcards.file} + ".xml"  {output.xml_model}
+		./gapseq/gapseq fill -m {input.draft} -n {input.med} -c {input.weights} -b 100 -g {input.genes} && echo {wildcards.file} && echo {output.xml_model} && mv {wildcards.file} + ".xml"  {output.xml_model} && mv {wildcards.file} + ".RDS"  {output.rds_model} 
 		"""
 
-#
-#
+
+                
+
 #
