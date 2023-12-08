@@ -18,7 +18,7 @@ binnames = [item for item in filenames if item.endswith(mag_ending)]
 # Implement cluster settings
 # move stuff to params
 # Move clone into deploy scripot 
-
+# Use log style from silvio https://github.com/Waschina/gapsnake/blob/main/workflow/rules/recon.smk
 rule all:
         input: 
                 "gapseq",
@@ -134,7 +134,7 @@ rule gap_filling:
                "gapseq.yml"
 	shell:
 		"""
-		./gapseq/gapseq fill -m {input.draft} -n {input.med} -c {input.weights} -b 100 -g {input.genes} && echo {wildcards.file} && echo {output.xml_model} && mv {wildcards.file} + ".xml"  {output.xml_model} && mv {wildcards.file} + ".RDS"  {output.rds_model} 
+		./gapseq/gapseq fill -m {input.draft} -n {input.med} -c {input.weights} -b 100 -g {input.genes} &&  mv {wildcards.file}.xml  {output.xml_model} && mv {wildcards.file}.RDS  {output.rds_model} 
 		"""
 
 
