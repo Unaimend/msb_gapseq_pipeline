@@ -19,7 +19,7 @@ binnames = [item for item in filenames if item.endswith(mag_ending)]
 # Implement cluster settings
 # move stuff to params
 # Move clone into deploy scripot 
-
+# Use log style from silvio https://github.com/Waschina/gapsnake/blob/main/workflow/rules/recon.smk
 rule all:
         input: 
                 "gapseq",
