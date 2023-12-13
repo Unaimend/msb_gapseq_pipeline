@@ -128,12 +128,12 @@ rule gap_filling:
                "gapseq.yml"
 	shell:
 		"""
-                if [ {use_medium} == "yes" ]; then
-                  echo "Input file exists, processing...";
+                # TODO MUCH CLEAN TO SET A VARIABLE IN THE IF AND THEN EXECUTE GS
+                if [ {use_medium} == "true" ]; then
+                    ./gapseq/gapseq fill -m {input.draft} -n {medium} -c {input.weights} -b 100 -g {input.genes} &&  mv {wildcards.file}.xml  {output.xml_model} && mv {wildcards.file}.RDS  {output.rds_model}
                 else
-                  echo "Input file not found!";
+                    ./gapseq/gapseq fill -m {input.draft} -n {input.med} -c {input.weights} -b 100 -g {input.genes} &&  mv {wildcards.file}.xml  {output.xml_model} && mv {wildcards.file}.RDS  {output.rds_model}
                 fi
-                #./gapseq/gapseq fill -m {input.draft} -n {input.med} -c {input.weights} -b 100 -g {input.genes} &&  mv {wildcards.file} + .xml  {output.xml_model} && mv {wildcards.file} + .RDS  {output.rds_model}
 		"""
 
 

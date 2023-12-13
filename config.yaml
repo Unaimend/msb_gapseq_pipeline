@@ -6,6 +6,6 @@ mag_ending: ".fna"
 # Folder of the MAGs. All the MAGs should end in `mag_ending`
 input_folder: "tutorial_files/"
 # Currently unused due to the fact the we do use the predicted media
-medium: "gf_medium.csv"
+medium: "tutorial_files/gf_medium.csv"
 # Use the above specified medium or not not. Can be set to "true" or "false"
 use_medium: "true"
