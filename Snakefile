@@ -135,7 +135,7 @@ rule gap_filling:
                "gapseq.yml"
 	shell:
 		"""
-		./gapseq/gapseq fill -m {input.draft} -n {input.med} -c {input.weights} -b 100 -g {input.genes} &&  mv {wildcards.file} + ".xml"  {output.xml_model} && mv {wildcards.file} + ".RDS"  {output.rds_model} 
+		./gapseq/gapseq fill -m {input.draft} -n {input.med} -c {input.weights} -b 100 -g {input.genes} &&  mv {wildcards.file} + .xml  {output.xml_model} && mv {wildcards.file} + .RDS  {output.rds_model}
 		"""
 
 
