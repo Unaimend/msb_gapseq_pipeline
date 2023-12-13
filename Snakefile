@@ -6,20 +6,13 @@ out_folder   =  config["out_folder"]
 input_folder =  config["input_folder"]
 medium       =  config["medium"]
 mag_ending   =  config["mag_ending"]
+use_medium   =  config["use_medium"]
 
 
 filenames = [f for f in listdir(input_folder)]
 binnames = [item for item in filenames if item.endswith(mag_ending)]
 
-# For including or excluding media
-# https://stackoverflow.com/questions/64949149/is-it-possible-to-add-a-conditional-statement-in-snakemakes-rule-all 
 
-# Implement CPLEX switch
-# Implement medium switch
-# Implement cluster settings
-# move stuff to params
-# Move clone into deploy scripot 
-# Use log style from silvio https://github.com/Waschina/gapsnake/blob/main/workflow/rules/recon.smk
 rule all:
         input: 
                 "gapseq",
@@ -135,7 +128,12 @@ rule gap_filling:
                "gapseq.yml"
 	shell:
 		"""
-		./gapseq/gapseq fill -m {input.draft} -n {input.med} -c {input.weights} -b 100 -g {input.genes} &&  mv {wildcards.file} + .xml  {output.xml_model} && mv {wildcards.file} + .RDS  {output.rds_model}
+                if [ {use_medium} == "yes" ]; then
+                  echo "Input file exists, processing...";
+                else
+                  echo "Input file not found!";
+                fi
+                #./gapseq/gapseq fill -m {input.draft} -n {input.med} -c {input.weights} -b 100 -g {input.genes} &&  mv {wildcards.file} + .xml  {output.xml_model} && mv {wildcards.file} + .RDS  {output.rds_model}
 		"""
 
 
