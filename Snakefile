@@ -16,7 +16,7 @@ binnames = [item for item in filenames if item.endswith(mag_ending)]
 rule all:
         input: 
                 "gapseq",
-                expand(out_folder + "prodigal/{file}"+ ".faa", file = binnames),
+                expand(os.path.join(out_folder, "prodigal/{file}.faa"), file = binnames),
 		expand(out_folder + "gapseq_find/{file}"+ "-all-Pathways.tbl", file = binnames),
 		expand(out_folder + "gapseq_find/{file}"+ "-all-Reactions.tbl", file = binnames),
                 expand(out_folder + "gapseq_transport/{file}"+ "-Transporter.tbl", file = binnames),
@@ -38,9 +38,9 @@ rule clone_gs:
 
 rule prodigal:
 	input:
-		bin=input_folder+"{file}"
+		bin= os.path.join(input_folder,"{file}")
 	output:
-		out=out_folder + "prodigal/" "{file}.faa"
+		out= os.path.join(out_folder, "prodigal/{file}.faa")
 	conda:
 		"prodigal.yml"
 	shell:
