@@ -16,16 +16,16 @@ binnames = [item for item in filenames if item.endswith(mag_ending)]
 rule all:
         input: 
                 "gapseq",
-                expand(out_folder + "prodigal/{file}"+ ".faa", file = binnames),
-		expand(out_folder + "gapseq_find/{file}"+ "-all-Pathways.tbl", file = binnames),
-		expand(out_folder + "gapseq_find/{file}"+ "-all-Reactions.tbl", file = binnames),
-                expand(out_folder + "gapseq_transport/{file}"+ "-Transporter.tbl", file = binnames),
-                expand(out_folder + "gapseq_draft/{file}"+ "-draft.RDS", file = binnames),
-                expand(out_folder + "gapseq_draft/{file}"+ "-rxnWeights.RDS", file = binnames),
-                expand(out_folder + "gapseq_draft/{file}"+ "-rxnXgenes.RDS", file = binnames),
-		expand(out_folder + "generated_medium/{file}"+ "-medium.csv", file = binnames),
-                expand(out_folder + "final_model/{file}"+ ".RDS", file = binnames),
-                expand(out_folder + "final_model/{file}"+ ".xml", file = binnames)
+                expand(os.path.join(out_folder, "prodigal/{file}.faa"), file = binnames),
+		expand(os.path.join(out_folder, "gapseq_find/{file}-all-Pathways.tbl"), file = binnames),
+		expand(os.path.join(out_folder, "gapseq_find/{file}-all-Reactions.tbl"), file = binnames),
+                expand(os.path.join(out_folder, "gapseq_transport/{file}-Transporter.tbl"), file = binnames),
+                expand(os.path.join(out_folder, "gapseq_draft/{file}-draft.RDS"), file = binnames),
+                expand(os.path.join(out_folder, "gapseq_draft/{file}-rxnWeights.RDS"), file = binnames),
+                expand(os.path.join(out_folder, "gapseq_draft/{file}-rxnXgenes.RDS"), file = binnames),
+		expand(os.path.join(out_folder, "generated_medium/{file}-medium.csv"), file = binnames),
+                expand(os.path.join(out_folder, "final_model/{file}.RDS"), file = binnames),
+                expand(os.path.join(out_folder, "final_model/{file}.xml"), file = binnames)
 
 rule clone_gs:
         output:
@@ -38,9 +38,9 @@ rule clone_gs:
 
 rule prodigal:
 	input:
-		bin=input_folder+"{file}"
+		bin= os.path.join(input_folder,"{file}")
 	output:
-		out=out_folder + "prodigal/" "{file}.faa"
+		out= os.path.join(out_folder, "prodigal/{file}.faa")
 	conda:
 		"prodigal.yml"
 	shell:
@@ -51,10 +51,10 @@ rule prodigal:
 rule pathway:
 	input:
                 "gapseq/",
-		faa=out_folder + "prodigal/{file}.faa"
+		faa=  os.path.join(out_folder, "prodigal/{file}.faa")
 	output:
-		out=out_folder + "gapseq_find/{file}"+ "-all-Pathways.tbl",
-		react=out_folder + "gapseq_find/{file}"+ "-all-Reactions.tbl"
+		out=os.path.join(out_folder, "gapseq_find/{file}-all-Pathways.tbl"),
+		react=os.path.join(out_folder, "gapseq_find/{file}-all-Reactions.tbl")
 	conda:
                "gapseq.yml"
 	shell:
@@ -67,28 +67,28 @@ rule pathway:
 rule transporter:
 	input:
                 "gapseq/",
-		faa=out_folder + "prodigal/{file}.faa"
+		faa=os.path.join(out_folder, "prodigal/{file}.faa")
 	output: 
-                out=out_folder + "gapseq_transport/{file}"+ "-Transporter.tbl"
+                out=os.path.join(out_folder, "gapseq_transport/{file}-Transporter.tbl")
 	conda:
                "gapseq.yml"
 	shell:
 		"""
-		./gapseq/gapseq find-transport -v 0 -k -b 200 {input.faa} &&
+		./gapseq/gapseq find-transport -v 0 -K -b 200 {input.faa} &&
 		mv {wildcards.file}-Transporter.tbl {output.out}
 		"""
 rule draft_model:
 	input:
                 "gapseq/",
-                faa=out_folder + "prodigal/{file}.faa",
-                path=out_folder + "gapseq_find/{file}"+ "-all-Pathways.tbl",
-                react=out_folder + "gapseq_find/{file}"+ "-all-Reactions.tbl",
-		trans=out_folder + "gapseq_transport/{file}"+ "-Transporter.tbl"	
+                faa   =os.path.join(out_folder, "prodigal/{file}.faa"),
+                path  =os.path.join(out_folder, "gapseq_find/{file}-all-Pathways.tbl"),
+                react =os.path.join(out_folder, "gapseq_find/{file}-all-Reactions.tbl"),
+		trans =os.path.join(out_folder, "gapseq_transport/{file}-Transporter.tbl")	
 	output:
-                draft_rds=out_folder + "gapseq_draft/{file}"+ "-draft.RDS",
-                draft_xml=out_folder + "gapseq_draft/{file}"+ "-draft.xml",
-                weights=out_folder + "gapseq_draft/{file}"+ "-rxnWeights.RDS",
-                genes=out_folder + "gapseq_draft/{file}"+ "-rxnXgenes.RDS"
+                draft_rds =os.path.join(out_folder, "gapseq_draft/{file}-draft.RDS"),
+                draft_xml =os.path.join(out_folder, "gapseq_draft/{file}-draft.xml"),
+                weights   =os.path.join(out_folder, "gapseq_draft/{file}-rxnWeights.RDS"),
+                genes     =os.path.join(out_folder, "gapseq_draft/{file}-rxnXgenes.RDS")
 	conda: 
                "gapseq.yml"
 	shell: 
@@ -102,10 +102,10 @@ rule draft_model:
 rule medium:
 	input:
                 "gapseq/",
-		draft=out_folder + "gapseq_draft/{file}"+ "-draft.RDS",
-		path=out_folder + "gapseq_find/{file}"+ "-all-Pathways.tbl"
+		draft =os.path.join(out_folder, "gapseq_draft/{file}-draft.RDS"),
+		path  =os.path.join(out_folder, "gapseq_find/{file}-all-Pathways.tbl")
 	output:
-		med=out_folder + "generated_medium/{file}"+ "-medium.csv"
+		med= os.path.join(out_folder, "generated_medium/{file}-medium.csv")
 	conda:
                 "gapseq.yml"
 	shell:
@@ -117,13 +117,13 @@ rule medium:
 rule gap_filling:
 	input:
                 "gapseq/",
-		draft=out_folder + "gapseq_draft/{file}"+ "-draft.RDS",
-                weights=out_folder + "gapseq_draft/{file}"+ "-rxnWeights.RDS",
-                genes=out_folder + "gapseq_draft/{file}"+ "-rxnXgenes.RDS",
-		med=out_folder + "generated_medium/{file}"+ "-medium.csv"
+		draft   = os.path.join(out_folder, "gapseq_draft/{file}-draft.RDS"),
+                weights = os.path.join(out_folder, "gapseq_draft/{file}-rxnWeights.RDS"),
+                genes   = os.path.join(out_folder, "gapseq_draft/{file}-rxnXgenes.RDS"),
+		med     = os.path.join(out_folder, "generated_medium/{file}-medium.csv")
 	output:
-		rds_model=out_folder + "final_model/{file}"+ ".RDS",
-		xml_model=out_folder + "final_model/{file}"+ ".xml"
+		rds_model=os.path.join(out_folder,"final_model/{file}.RDS"),
+		xml_model=os.path.join(out_folder,"final_model/{file}.xml")
 	conda:
                "gapseq.yml"
 	shell:
