@@ -58,7 +58,7 @@ rule pathway:
 	conda:
                "gapseq.yml"
         resources:
-                slurm_extra="--cpus-per-task=10",
+                slurm_extra="--cpus-per-task=10"
 	shell:
 		"""
 		./gapseq/gapseq find -v 0 -k -b 200 -p all -t auto {input.faa} && 
@@ -75,7 +75,7 @@ rule transporter:
 	conda:
                "gapseq.yml"
         resources:
-                slurm_extra="--cpus-per-task=10",
+                slurm_extra="--cpus-per-task=10"
 	shell:
 		"""
 		./gapseq/gapseq find-transport -v 0 -K -b 200 {input.faa} &&
