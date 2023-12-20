@@ -57,6 +57,8 @@ rule pathway:
 		react=os.path.join(out_folder, "gapseq_find/{file}-all-Reactions.tbl")
 	conda:
                "gapseq.yml"
+        resources:
+                slurm_extra="--cpus-per-task=10",
 	shell:
 		"""
 		./gapseq/gapseq find -v 0 -k -b 200 -p all -t auto {input.faa} && 
@@ -72,6 +74,8 @@ rule transporter:
                 out=os.path.join(out_folder, "gapseq_transport/{file}-Transporter.tbl")
 	conda:
                "gapseq.yml"
+        resources:
+                slurm_extra="--cpus-per-task=10",
 	shell:
 		"""
 		./gapseq/gapseq find-transport -v 0 -K -b 200 {input.faa} &&
