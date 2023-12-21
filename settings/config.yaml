@@ -2,7 +2,7 @@ cluster:
   mkdir -p logs/{rule} &&
   sbatch
     --qos={resources.qos}
-    --cpus-per-task={threads}
+    --cpus-per-task={resources.threads}
     --mem={resources.mem_mb}
     --time={resources.time}
     --job-name=smk-{rule}-{wildcards}
@@ -14,7 +14,7 @@ default-resources:
   - qos=normal
   - mem_mb=1000
   - time="2:00:00"
-  - slurm_extra="--cpus-per-task=1",
+  - threads=1
 restart-times: 0
 max-jobs-per-second: 10
 max-status-checks-per-second: 1
