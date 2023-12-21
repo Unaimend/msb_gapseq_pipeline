@@ -9,3 +9,6 @@ input_folder: "tutorial_files/"
 medium: "tutorial_files/gf_medium.csv"
 # Use the above specified medium or not not. Can be set to "true" or "false"
 use_medium: "true"
+# Keep list: Path to a list of MAG names that should be used in model building, ignored if ""
+# This settings enables you to only build models for a subset of all bins specified in the input_folder
+keep_list: ""
