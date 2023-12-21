@@ -1,5 +1,5 @@
 # MSB GAPSEQ PIPELINE
-Ever wanted to just fast and easy build gapseqs. Now is your chance. Just 4.99$ per month. Please contact your local HiWi
+Ever wanted to fast and easily build gapseqs? Now is your chance! Just 4.99$ per month. Please contact your local HiWi
 
 
 
