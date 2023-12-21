@@ -74,7 +74,8 @@ rule pathway:
         conda:
                "gapseq.yml"
         resources:
-                threads = 10
+                threads = 10,
+                time= "6:00:00"
         shell:
                 """
                 ./gapseq/gapseq find -v 0  -b 200 -p all -t auto {input.faa} && 
@@ -91,8 +92,8 @@ rule transporter:
         conda:
                "gapseq.yml"
         resources:
-                threads = 10
-                time= "6:00:00"
+                threads = 10,
+                time= "6:30:00"
         shell:
                 """
                 ./gapseq/gapseq find-transport -v 0  -b 200 {input.faa} &&
