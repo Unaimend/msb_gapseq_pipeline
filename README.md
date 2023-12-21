@@ -11,7 +11,7 @@ Ever wanted to just fast and easy build gapseqs. Now is your chance. Just 4.99$ 
 
 ## Starting a new project
 
-`Cd` to your local project folder and run `git clone git@github.com:Unaimend/msb_gapseq_pipeline.git`
+`cd` to your local project folder and run `git clone git@github.com:Unaimend/msb_gapseq_pipeline.git` and activate your mamba env containing snakemake
 
 Lets now assume there exist some folder called $MyMAGs$ with files called $mag1.fa$ to $magn.fa$ that contains your pre-build MAGs.
 To tell the pipeline to use this folder as input open the `config.yaml` and change the `input_folder` and `mag_ending` to the appropriate values. 
