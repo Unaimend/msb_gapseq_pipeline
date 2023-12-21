@@ -27,7 +27,6 @@ else:
 
 
 binnames = [os.path.splitext(file_name)[0] for file_name in binnames]
-print(binnames)
 
 rule all:
         input: 
