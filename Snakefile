@@ -8,6 +8,7 @@ medium              =  config["medium"]
 mag_ending          =  config["mag_ending"]
 use_medium          =  config["use_medium"]
 keep_list_folder    =  config["keep_list"]
+extension           =  config["mag_ending"]
 
 keep_list           = []
 bin_names           = []
@@ -22,6 +23,11 @@ if keep_list_folder != "":
         binnames =  list(set(binnames) & set(keep_list))
 else:
         binnames = [item for item in filenames if item.endswith(mag_ending)]
+
+
+
+binnames = [os.path.splitext(file_name)[0] for file_name in binnames]
+print(binnames)
 
 rule all:
         input: 
@@ -48,7 +54,7 @@ rule clone_gs:
 
 rule prodigal:
         input:
-                bin= os.path.join(input_folder,"{file}")
+                bin= os.path.join(input_folder,"{file}") + extension
         output:
                 out= os.path.join(out_folder, "prodigal/{file}.faa")
         conda:
@@ -86,6 +92,7 @@ rule transporter:
                "gapseq.yml"
         resources:
                 slurm_extra="--cpus-per-task=10"
+                time= "6:00:00"
         shell:
                 """
                 ./gapseq/gapseq find-transport -v 0  -b 200 {input.faa} &&
