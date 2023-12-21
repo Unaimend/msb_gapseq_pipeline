@@ -45,3 +45,7 @@ To test the pipeline (takes around 2 hours) run
 ```
 snakemake --cores 2 --use-conda
 ```
+
+## Contributing 
+
+Please contact Thomas or open a pull request 
