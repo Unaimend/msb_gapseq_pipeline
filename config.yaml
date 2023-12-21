@@ -1,5 +1,4 @@
 # Folder where we want to store all the output files
-# WARNING: Currently only "" was tested
 out_folder: ""
 # File ending of the MAGS
 mag_ending: ".fna"
@@ -11,4 +10,4 @@ medium: "tutorial_files/gf_medium.csv"
 use_medium: "true"
 # Keep list: Path to a list of MAG names that should be used in model building, ignored if ""
 # This settings enables you to only build models for a subset of all bins specified in the input_folder
-keep_list: ""
+keep_list: "<cores>"
