@@ -1,3 +1,5 @@
+![Alt text](https://media.licdn.com/dms/image/C5612AQFeuc8wGvpqCQ/article-cover_image-shrink_600_2000/0/1520153284462?e=2147483647&v=beta&t=GXw7inqPA0St-iozVMaSRE2cEOgoUAv8HqTz2T0QvRQ.png)
+
 # MSB GAPSEQ PIPELINE
 Ever wanted to fast and easily build gapseqs? Now is your chance! Just 4.99$ per month. Please contact your local HiWi
 
