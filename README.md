@@ -1,8 +1,4 @@
 
-## Acknowledgement
-Thanks to Samer Alban for providing the actual code to run MicrobiomeGS. As users of the package please include him in your list of authors, further include Thomas Dost if you deem the transformation of Samer's code into a Snakemake pipeline enough for inclusion.
-
-
 ![Alt text](https://i.kym-cdn.com/photos/images/newsfeed/000/016/809/rtfm.jpg?1318992465)
 
 # MSB GAPSEQ PIPELINE
