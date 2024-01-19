@@ -9,6 +9,7 @@ Ever wanted to fast and easily build gapseqs? Now is your chance! Just 4.99$ per
 * mamba
 * git
 * Snakemake
+* Have a ssh key registered in GitLab
 * Love for metabolic modelling 
 
 ## Starting a new project
