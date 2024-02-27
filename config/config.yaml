@@ -1,11 +1,11 @@
 # Folder where we want to store all the output files
-out_folder: ""
+out_folder: "../results/"
 # File ending of the MAGS
 mag_ending: ".fna"
 # Folder of the MAGs. All the MAGs should end in `mag_ending`
-input_folder: "tutorial_files/"
+input_folder: "../resources/tutorial_files/"
 # Currently unused due to the fact the we do use the predicted media
-medium: "tutorial_files/gf_medium.csv"
+medium: "../resources/tutorial_files/gf_medium.csv"
 # Use the above specified medium or not not. Can be set to "true" or "false"
 use_medium: "true"
 # Keep list: Path to a list of MAG names that should be used in model building, ignored if ""
