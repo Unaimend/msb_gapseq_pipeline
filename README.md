@@ -14,7 +14,7 @@ Ever wanted to fast and easily build gapseqs? Now is your chance! Just 4.99$ per
 * Love for metabolic modelling 
 
 ## Starting a new project
-DISCLAIMER: You should most likely read the `Integrating it into an existing project` section down below. The current section will make it quite annoying to integrate this pipeline into an existing git project. And because you are a good person you adhere to Thomas' idea of how to structure a project you want to use git for everything :).
+DISCLAIMER: You should most likely read the `Integrating it into an existing project` section down below (if you use git to mange your files). The current section will make it quite annoying to integrate this pipeline into an existing git project. And because you are a good person you adhere to Thomas' idea of how to structure a project you want to use git for everything :).
 
 
 `cd` to your local project folder and run `git clone  git@cau-git.rz.uni-kiel.de:MSB/pipelines/gapseq_pipeline.git` and activate your mamba env containing snakemake
@@ -30,7 +30,7 @@ As mentioned above the settings for the pipeline can be found in the `config.yam
 Here you can specify an `out_folder` where all the **produced files** will end up.
 If a **custom medium** should be used, specify a path  medium and set `use_medium` to true to use a custom medium.
 If you instead want to use the gapseq-predicted media just set `use_medium` to false, the pipeline will the automatically use the gs-predicted media.
-
+Further check if your mags end in `.fna` or change the ending to the appropriate value
 
 ### Subsetting the MAGs
 If for some reason you want to build models for a subset of your MAGs specify a path in the `keep_list` variable. If for example you just want to build models for $mag3$ and $mag4$. The keep file looks like this
@@ -43,6 +43,7 @@ I.e. a `\n` separated file of the mag names you want to build models for.
 That's all of the input/output configuration you have to do.
 
 ### Executing the pipeline 
+`cd` into `gapseq_pipeline/workflow`
 
 To run locally execute
 ```
@@ -62,13 +63,13 @@ snakemake --cores 2 --use-conda
 ## Integrating it into an existing project
 `cd` to your local project folder and create a folder called `submodules` and cd into this directory. There create a directory called `configs` which will be empty for now,
 and run `git submodule add  git@cau-git.rz.uni-kiel.de:MSB/pipelines/gapseq_pipeline.git`.
-The next step is then .... contact Thomas because this is currently not fully implemented
+The next step is then .... contact Thomas because this is currently fully implemented but not documented
 
 
 
 ## Contributing 
 
-Please contact Thomas or open a pull request 
+Please contact Thomas OR open a pull request 
 
 ## Problems
 

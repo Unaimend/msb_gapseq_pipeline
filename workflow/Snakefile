@@ -1,6 +1,9 @@
 ####
 from os import listdir
 from os.path import isfile, join
+import yaml
+
+
 configfile: "../config/config.yaml"
 out_folder          =  config["out_folder"]
 input_folder        =  config["input_folder"]
@@ -14,6 +17,32 @@ keep_list           = []
 bin_names           = []
 filenames           = [f for f in listdir(input_folder)]
 
+# Specify the directory name to check
+directory_to_check = "../../configs"
+
+# Specify the directory and file name to parse
+yaml_file_name = "gapseq_config.yaml"
+
+# Create the full path to the YAML file
+yaml_file_path = os.path.join(directory_to_check, yaml_file_name)
+
+# Check if the file exists before attempting to parse
+if os.path.exists(yaml_file_path) and os.path.isfile(yaml_file_path):
+    # Parse the YAML file
+    with open(yaml_file_path, 'r') as yaml_file:
+        yaml_data = yaml.safe_load(yaml_file)
+
+        # Overwrite the config data
+        for key, value in yaml_data.items():
+            if not key in  config.keys():
+                print(f"ERROR tried to overwrite an unspecified key: {key}", file = sys.stderr)
+                sys.exit(255)
+            print(f"Overwriting the key {key} with {value}", file = sys.stderr)
+            config[key] = value
+
+else:
+    print(f"The specified YAML file '{yaml_file_name}' does not exist in the 'config' directory. No settings will be overwritten", file = sys.stderr)
+
 
 if keep_list_folder != "":
         with open(keep_list_folder, 'r') as file:
@@ -23,8 +52,6 @@ if keep_list_folder != "":
         binnames =  list(set(binnames) & set(keep_list))
 else:
         binnames = [item for item in filenames if item.endswith(mag_ending)]
-
-
 
 binnames = [os.path.splitext(file_name)[0] for file_name in binnames]
 
@@ -82,7 +109,7 @@ rule pathway:
                 time= "6:00:00"
         shell:
                 """
-                ../gapseq/gapseq find -v 0  -b 200 -p all -K {resources.threads}  {input.faa} && 
+                ../gapseq/gapseq find -v 0  -b 200 -p all -K {resources.threads} -O  {input.faa} && 
                 mv {wildcards.file}-all-Pathways.tbl {output.out} &&
                 mv {wildcards.file}-all-Reactions.tbl {output.react}
                 """
