@@ -1,0 +1,4 @@
+gapseq/
+results/
+.snakemake/
+logs/

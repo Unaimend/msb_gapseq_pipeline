@@ -33,21 +33,22 @@ rule all:
                 "../gapseq",
                 expand(os.path.join(out_folder, "prodigal/{file}.faa"), file = binnames),
                 expand(os.path.join(out_folder, "gapseq_find/{file}-all-Pathways.tbl"), file = binnames),
-                expand(os.path.join(out_folder, "gapseq_find/{file}-all-Reactions.tbl"), file = binnames)
-                #expand(os.path.join(out_folder, "gapseq_transport/{file}-Transporter.tbl"), file = binnames),
-                #expand(os.path.join(out_folder, "gapseq_draft/{file}-draft.RDS"), file = binnames),
-                #expand(os.path.join(out_folder, "gapseq_draft/{file}-rxnWeights.RDS"), file = binnames),
-                #expand(os.path.join(out_folder, "gapseq_draft/{file}-rxnXgenes.RDS"), file = binnames),
-                #expand(os.path.join(out_folder, "generated_medium/{file}-medium.csv"), file = binnames),
-                #expand(os.path.join(out_folder, "final_model/{file}.RDS"), file = binnames),
-                #expand(os.path.join(out_folder, "final_model/{file}.xml"), file = binnames)
+                expand(os.path.join(out_folder, "gapseq_find/{file}-all-Reactions.tbl"), file = binnames),
+                expand(os.path.join(out_folder, "gapseq_transport/{file}-Transporter.tbl"), file = binnames),
+                expand(os.path.join(out_folder, "gapseq_draft/{file}-draft.RDS"), file = binnames),
+                expand(os.path.join(out_folder, "gapseq_draft/{file}-rxnWeights.RDS"), file = binnames),
+                expand(os.path.join(out_folder, "gapseq_draft/{file}-rxnXgenes.RDS"), file = binnames),
+                expand(os.path.join(out_folder, "generated_medium/{file}-medium.csv"), file = binnames),
+                expand(os.path.join(out_folder, "final_model/{file}.RDS"), file = binnames),
+                expand(os.path.join(out_folder, "final_model/{file}.xml"), file = binnames)
 
 rule clone_gs:
         output:
                 directory("../gapseq")
+        log: stdout="logs/clone_gs.out", stderr="logs/clone_gs.err"
         shell: 
                 """
-                git clone https://github.com/jotech/gapseq && mv gapseq/gapseq_env.yml gapseq.yml && 		     mv gapseq ../
+                git clone https://github.com/jotech/gapseq && mv gapseq/gapseq_env.yml gapseq.yml &&		     mv gapseq ../
 
                 """
 
@@ -56,6 +57,8 @@ rule prodigal:
                 bin= os.path.join(input_folder,"{file}") + extension
         output:
                 out= os.path.join(out_folder, "prodigal/{file}.faa")
+        log:
+                stdout = "logs/prodigal/{file}.out",  stderr = "logs/prodigal/{file}.err"  
         conda:
                 "envs/prodigal.yml"
         shell:
@@ -70,6 +73,8 @@ rule pathway:
         output:
                 out=os.path.join(out_folder, "gapseq_find/{file}-all-Pathways.tbl"),
                 react=os.path.join(out_folder, "gapseq_find/{file}-all-Reactions.tbl")
+        log:
+                stdout = "logs/pathway/{file}.out",  stderr = "logs/pathway/{file}.err"  
         conda:
                "envs/gapseq.yml"
         resources:
@@ -77,7 +82,7 @@ rule pathway:
                 time= "6:00:00"
         shell:
                 """
-                ../gapseq/gapseq find -v 0  -b 200 -p all -t auto {input.faa} && 
+                ../gapseq/gapseq find -v 0  -b 200 -p all -K {resources.threads}  {input.faa} && 
                 mv {wildcards.file}-all-Pathways.tbl {output.out} &&
                 mv {wildcards.file}-all-Reactions.tbl {output.react}
                 """
@@ -88,6 +93,8 @@ rule transporter:
                 faa=os.path.join(out_folder, "prodigal/{file}.faa")
         output: 
                 out=os.path.join(out_folder, "gapseq_transport/{file}-Transporter.tbl")
+        log:
+                stdout = "logs/transporter/{file}.out",  stderr = "logs/transporter/{file}.err"  
         conda:
                "envs/gapseq.yml"
         resources:
@@ -95,7 +102,7 @@ rule transporter:
                 time= "6:30:00"
         shell:
                 """
-                ../gapseq/gapseq find-transport -v 0  -b 200 {input.faa} &&
+                ../gapseq/gapseq find-transport -v 0 -K {resources.threads}  -b 200 {input.faa} &&
                 mv {wildcards.file}-Transporter.tbl {output.out}
                 """
 rule draft_model:
@@ -110,11 +117,13 @@ rule draft_model:
                 draft_xml =os.path.join(out_folder, "gapseq_draft/{file}-draft.xml"),
                 weights   =os.path.join(out_folder, "gapseq_draft/{file}-rxnWeights.RDS"),
                 genes     =os.path.join(out_folder, "gapseq_draft/{file}-rxnXgenes.RDS")
+        log:
+                stdout = "logs/draft_model/{file}.out",  stderr = "logs/draft_model/{file}.err"  
         conda: 
                "envs/gapseq.yml"
         shell: 
                 """
-        ./gapseq/gapseq draft -r {input.react} -t {input.trans} -c {input.faa} -u 200 -l 100 -p {input.path} #&&
+        ../gapseq/gapseq draft -r {input.react} -t {input.trans} -c {input.faa} -u 200 -l 100 -p {input.path} #&&
         mv {wildcards.file}-draft.RDS {output.draft_rds} &&
         mv {wildcards.file}-draft.xml {output.draft_xml} &&
         mv {wildcards.file}-rxnWeights.RDS {output.weights} &&
@@ -127,6 +136,8 @@ rule medium:
                 path  =os.path.join(out_folder, "gapseq_find/{file}-all-Pathways.tbl")
         output:
                 med= os.path.join(out_folder, "generated_medium/{file}-medium.csv")
+        log:
+                stdout = "logs/medium/{file}.out",  stderr = "logs/medium/{file}.err"  
         conda:
                 "envs/gapseq.yml"
         shell:
@@ -145,6 +156,8 @@ rule gap_filling:
         output:
                 rds_model=os.path.join(out_folder,"final_model/{file}.RDS"),
                 xml_model=os.path.join(out_folder,"final_model/{file}.xml")
+        log:
+                stdout = "logs/gap_filling/{file}.out",  stderr = "logs/gap_filling/{file}.err"  
         conda:
                "envs/gapseq.yml"
         shell:
